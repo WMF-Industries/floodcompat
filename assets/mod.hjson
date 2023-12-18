@@ -1,0 +1,9 @@
+displayName: "[cyan]FloodCompat"
+name: "[cyan]FloodCompat"
+author: "io community"
+main: "floodcompat.floodcompat"
+description: "Reduces desyncs & applies flood changes on join. [v0.1]"
+version: "0.1"
+minGameVersion: 146
+java: true
+hidden: true
