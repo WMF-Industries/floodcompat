@@ -12,7 +12,6 @@ import mindustry.mod.*;
 
 public class floodcompat extends Mod{
     boolean flood, applied;
-    Ability PulsarAbility, BrydeAbility;
     public floodcompat(){
         Log.info("Flood Compatibility loaded!");
 
@@ -67,7 +66,6 @@ public class floodcompat extends Mod{
                 UnitTypes.gamma.weapons.forEach(w -> {
                     w.bullet.buildingDamageMultiplier = 1;
                 });
-                UnitTypes.pulsar.abilities.remove(0);
                 UnitTypes.crawler.health = 100;
                 UnitTypes.crawler.speed = 1.5f;
                 UnitTypes.crawler.accel = 0.08f;
@@ -113,15 +111,9 @@ public class floodcompat extends Mod{
                         w.bullet.collidesGround = true;
                     }
                 });
-                UnitTypes.bryde.abilities.remove(0);
 
                 applied = true;
             }
-        });
-
-        Events.on(EventType.ContentInitEvent.class, e -> {
-            PulsarAbility = UnitTypes.pulsar.abilities.get(0);
-            BrydeAbility = UnitTypes.bryde.abilities.get(0);
         });
 
         Events.on(EventType.WorldLoadEvent.class, e -> {
@@ -180,7 +172,6 @@ public class floodcompat extends Mod{
                         UnitTypes.gamma.weapons.forEach(w -> {
                             w.bullet.buildingDamageMultiplier = 0.01f;
                         });
-                        UnitTypes.pulsar.abilities.add(PulsarAbility);
                         UnitTypes.crawler.health = 200;
                         UnitTypes.crawler.speed = 1f;
                         UnitTypes.crawler.accel = 0;
@@ -229,7 +220,6 @@ public class floodcompat extends Mod{
                                 w.bullet.collidesGround = false;
                             }
                         });
-                        UnitTypes.bryde.abilities.add(BrydeAbility);
 
                         Vars.ui.chatfrag.addMessage("[accent]Flood changes reverted!\nConsider using /sync if playing on a server!\nIf you are the host, ignore this message!");
                         applied = false;
