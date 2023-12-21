@@ -12,10 +12,9 @@ import mindustry.mod.*;
 
 public class floodcompat extends Mod{
     boolean flood, applied;
+    Ability PulsarAbility, BrydeAbility;
     public floodcompat(){
         Log.info("Flood Compatibility loaded!");
-        Ability PulsarAbility = UnitTypes.pulsar.abilities.get(0);
-        Ability BrydeAbility = UnitTypes.bryde.abilities.get(0);
 
         Vars.netClient.addPacketHandler("flood", (integer) -> {
             if(Strings.canParseInt(integer)){
@@ -118,6 +117,11 @@ public class floodcompat extends Mod{
 
                 applied = true;
             }
+        });
+
+        Events.on(EventType.ContentInitEvent.class, e -> {
+            PulsarAbility = UnitTypes.pulsar.abilities.get(0);
+            BrydeAbility = UnitTypes.bryde.abilities.get(0);
         });
 
         Events.on(EventType.WorldLoadEvent.class, e -> {
