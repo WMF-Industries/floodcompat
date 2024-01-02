@@ -9,6 +9,14 @@ import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
+import mindustry.world.blocks.defense.ForceProjector;
+import mindustry.world.blocks.defense.MendProjector;
+import mindustry.world.blocks.defense.Wall;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.blocks.defense.turrets.TractorBeamTurret;
+
+import static mindustry.Vars.state;
 
 public class floodcompat extends Mod{
     boolean flood, applied;
@@ -21,34 +29,46 @@ public class floodcompat extends Mod{
                 if(applied) return;
                 Vars.ui.chatfrag.addMessage("[lime]Server check succeeded!\n[accent]Applying flood changes!");
 
+                state.rules.hideBannedBlocks = true;
+                state.rules.bannedBlocks.addAll(Blocks.lancer, Blocks.arc);
+                state.rules.revealedBlocks.addAll(Blocks.coreShard, Blocks.scrapWall, Blocks.scrapWallLarge, Blocks.scrapWallHuge, Blocks.scrapWallGigantic);
+
                 Blocks.scrapWall.solid=Blocks.titaniumWall.solid=Blocks.thoriumWall.solid=false;
-                Blocks.scrapWall.health = 50;
-                Blocks.scrapWall.armor = 0;
-                Blocks.titaniumWall.health = 75;
-                Blocks.titaniumWall.armor = 0;
-                Blocks.thoriumWall.health = 100;
-                Blocks.thoriumWall.armor = 0;
-                Blocks.phaseWall.health = 125;
-                Blocks.phaseWall.armor = 0;
-                Blocks.surgeWall.health = 150;
-                Blocks.surgeWall.armor = 0;
-                Blocks.reinforcedSurgeWall.health = 175;
-                Blocks.reinforcedSurgeWall.armor = 0;
-                Blocks.plastaniumWall.health = 200;
-                Blocks.plastaniumWall.armor = 0;
-                Blocks.berylliumWall.health = 225;
-                Blocks.berylliumWall.armor = 0;
+                ((Wall) Blocks.phaseWall).chanceDeflect = 0;
+                ((Wall) Blocks.surgeWall).lightningChance = 0;
+                ((Wall) Blocks.reinforcedSurgeWall).lightningChance = 0;
                 Blocks.berylliumWall.absorbLasers = true;
-                Blocks.tungstenWall.health = 250;
-                Blocks.tungstenWall.armor = 0;
+                Blocks.berylliumWall.insulated = true;
                 Blocks.tungstenWall.absorbLasers = true;
-                Blocks.carbideWall.health = 300;
-                Blocks.carbideWall.armor = 0;
+                Blocks.tungstenWall.insulated = true;
                 Blocks.carbideWall.absorbLasers = true;
+                Blocks.carbideWall.insulated = true;
+                ((MendProjector) Blocks.mender).reload = 800;
+                ((MendProjector) Blocks.mendProjector).reload = 500;
                 Blocks.radar.health = 500;
                 Blocks.shockwaveTower.health = 2000;
                 Blocks.thoriumReactor.health = 1400;
+                Blocks.massDriver.health = 1250;
                 Blocks.impactReactor.rebuildable = false;
+                ((ItemTurret) Blocks.fuse).ammoTypes.forEach(a -> {
+                    a.value.pierce = false;
+                    if(a.value.damage == 66){
+                        a.value.damage = 10;
+                    }else a.value.damage = 20;
+                });
+                ((ItemTurret) Blocks.scathe).ammoTypes.forEach(a -> {
+                    a.value.buildingDamageMultiplier = 0.3f;
+                    a.value.damage = 700;
+                    a.value.splashDamage = 80;
+                });
+                ((PowerTurret) Blocks.lancer).shootType.damage = 10;
+                ((PowerTurret) Blocks.arc).shootType.damage = 4;
+                ((PowerTurret) Blocks.arc).shootType.lightningLength = 15;
+                ((TractorBeamTurret) Blocks.parallax).force = 8;
+                ((TractorBeamTurret) Blocks.parallax).scaledForce = 7;
+                ((TractorBeamTurret) Blocks.parallax).range = 230;
+                ((TractorBeamTurret) Blocks.parallax).damage = 6;
+                ((ForceProjector) Blocks.forceProjector).shieldHealth = 2500;
 
                 UnitTypes.merui.weapons.forEach(w -> {
                     if(w.bullet instanceof ArtilleryBulletType) w.bullet.collides = true;
@@ -121,47 +141,55 @@ public class floodcompat extends Mod{
             int delay = Vars.net.client() ? 3 : 0;
             flood = false;
 
-            if(delay > 0) Call.serverPacketReliable("flood", "v0.1");
+            if(delay > 0) Call.serverPacketReliable("flood", "v0.2");
             Timer.schedule(() -> {
                 // this is for cleanup only
                 if(!flood){
                     if(Vars.net.client()) Vars.ui.chatfrag.addMessage("[scarlet]Server check failed...\n[accent]Playing on flood? Try rejoining!\nHave a nice day!");
                     if(applied){
                         Blocks.scrapWall.solid=Blocks.titaniumWall.solid=Blocks.thoriumWall.solid=true;
-                        Blocks.scrapWall.health = 240;
-                        Blocks.scrapWall.armor = 0;
-                        Blocks.titaniumWall.health = 440;
-                        Blocks.titaniumWall.armor = 0;
-                        Blocks.thoriumWall.health = 800;
-                        Blocks.thoriumWall.armor = 0;
-                        Blocks.phaseWall.health = 600;
-                        Blocks.phaseWall.armor = 0;
-                        Blocks.surgeWall.health = 920;
-                        Blocks.surgeWall.armor = 0;
-                        Blocks.reinforcedSurgeWall.health = 1000;
-                        Blocks.reinforcedSurgeWall.armor = 20f;
-                        Blocks.plastaniumWall.health = 500;
-                        Blocks.plastaniumWall.armor = 0;
-                        Blocks.berylliumWall.health = 520;
-                        Blocks.berylliumWall.armor = 2f;
+                        ((Wall) Blocks.phaseWall).chanceDeflect = 10;
+                        ((Wall) Blocks.surgeWall).lightningChance = 0.05f;
+                        ((Wall) Blocks.reinforcedSurgeWall).lightningChance = 0.05f;
                         Blocks.berylliumWall.absorbLasers = false;
-                        Blocks.tungstenWall.health = 720;
-                        Blocks.tungstenWall.armor = 14f;
+                        Blocks.berylliumWall.insulated = false;
                         Blocks.tungstenWall.absorbLasers = false;
-                        Blocks.carbideWall.health = 1080;
-                        Blocks.carbideWall.armor = 16f;
+                        Blocks.tungstenWall.insulated = false;
                         Blocks.carbideWall.absorbLasers = false;
+                        Blocks.carbideWall.insulated = false;
+                        ((MendProjector) Blocks.mender).reload = 200;
+                        ((MendProjector) Blocks.mendProjector).reload = 250;
                         Blocks.radar.health = 60;
                         Blocks.shockwaveTower.health = 915;
                         Blocks.thoriumReactor.health = 700;
+                        Blocks.massDriver.health = 430;
                         Blocks.impactReactor.rebuildable = true;
+                        ((ItemTurret) Blocks.fuse).ammoTypes.forEach(a -> {
+                            a.value.pierce = true;
+                            if(a.value.damage == 10){
+                                a.value.damage = 66;
+                            }else a.value.damage = 105;
+                        });
+                        ((ItemTurret) Blocks.scathe).ammoTypes.forEach(a -> {
+                            a.value.buildingDamageMultiplier = 0.2f;
+                            a.value.damage = 1500;
+                            a.value.splashDamage = 160;
+                        });
+                        ((PowerTurret) Blocks.lancer).shootType.damage = 140;
+                        ((PowerTurret) Blocks.arc).shootType.damage = 20;
+                        ((PowerTurret) Blocks.arc).shootType.lightningLength = 25;
+                        ((TractorBeamTurret) Blocks.parallax).force = 12f;
+                        ((TractorBeamTurret) Blocks.parallax).scaledForce = 6f;
+                        ((TractorBeamTurret) Blocks.parallax).range = 240f;
+                        ((TractorBeamTurret) Blocks.parallax).damage = 0.3f;
+                        ((ForceProjector) Blocks.forceProjector).shieldHealth = 750;
 
                         UnitTypes.merui.weapons.forEach(w -> {
                             if(w.bullet instanceof ArtilleryBulletType) w.bullet.collides = false;
                         });
                         UnitTypes.quad.weapons.forEach(w -> {
                             w.bullet.pierceBuilding = false;
-                            w.bullet.pierceCap = 0;
+                            w.bullet.pierceCap = -1;
                         });
                         UnitTypes.alpha.weapons.forEach(w -> {
                             w.bullet.buildingDamageMultiplier = 0.01f;
