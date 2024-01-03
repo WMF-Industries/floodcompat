@@ -1,129 +1,124 @@
 package floodcompat;
 
 import arc.*;
+import arc.struct.Seq;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
-import mindustry.world.blocks.defense.ForceProjector;
-import mindustry.world.blocks.defense.MendProjector;
-import mindustry.world.blocks.defense.Wall;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
-import mindustry.world.blocks.defense.turrets.PowerTurret;
-import mindustry.world.blocks.defense.turrets.TractorBeamTurret;
+import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.defense.turrets.*;
 
-import static mindustry.Vars.state;
+import java.util.Objects;
+
+import static mindustry.content.UnitTypes.*;
+import static mindustry.content.Blocks.*;
+import static mindustry.Vars.*;
 
 public class floodcompat extends Mod{
     boolean flood, applied;
+    Ability pulsarAbility, brydeAbility;
     public floodcompat(){
         Log.info("Flood Compatibility loaded!");
 
-        Vars.netClient.addPacketHandler("flood", (integer) -> {
+        Events.on(EventType.ContentInitEvent.class, e -> {
+            pulsarAbility = pulsar.abilities.first();
+            brydeAbility = bryde.abilities.first();
+        });
+
+        netClient.addPacketHandler("flood", (integer) -> {
             if(Strings.canParseInt(integer)){
                 flood = true;
                 if(applied) return;
-                Vars.ui.chatfrag.addMessage("[lime]Server check succeeded!\n[accent]Applying flood changes!");
+                ui.chatfrag.addMessage("[lime]Server check succeeded!\n[accent]Applying flood changes!");
 
                 state.rules.hideBannedBlocks = true;
                 state.rules.bannedBlocks.addAll(Blocks.lancer, Blocks.arc);
                 state.rules.revealedBlocks.addAll(Blocks.coreShard, Blocks.scrapWall, Blocks.scrapWallLarge, Blocks.scrapWallHuge, Blocks.scrapWallGigantic);
 
-                Blocks.scrapWall.solid=Blocks.titaniumWall.solid=Blocks.thoriumWall.solid=false;
-                ((Wall) Blocks.phaseWall).chanceDeflect = 0;
-                ((Wall) Blocks.surgeWall).lightningChance = 0;
-                ((Wall) Blocks.reinforcedSurgeWall).lightningChance = 0;
-                Blocks.berylliumWall.absorbLasers = true;
-                Blocks.berylliumWall.insulated = true;
-                Blocks.tungstenWall.absorbLasers = true;
-                Blocks.tungstenWall.insulated = true;
-                Blocks.carbideWall.absorbLasers = true;
-                Blocks.carbideWall.insulated = true;
-                ((MendProjector) Blocks.mender).reload = 800;
-                ((MendProjector) Blocks.mendProjector).reload = 500;
-                Blocks.radar.health = 500;
-                Blocks.shockwaveTower.health = 2000;
-                Blocks.thoriumReactor.health = 1400;
-                Blocks.massDriver.health = 1250;
-                Blocks.impactReactor.rebuildable = false;
-                ((ItemTurret) Blocks.fuse).ammoTypes.values().toSeq().each(a -> a.pierce = false);
-                ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.titanium).damage = 10;
-                ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.thorium).damage = 20;
-                ((ItemTurret) Blocks.scathe).ammoTypes.values().toSeq().each(a -> {
+                Seq.with(scrapWall, titaniumWall, thoriumWall).each(w -> w.solid = false);
+                Seq.with(berylliumWall, tungstenWall, carbideWall).each(w -> {
+                    w.insulated = w.absorbLasers = true;
+                });
+                ((Wall) phaseWall).chanceDeflect = 0;
+                ((Wall) surgeWall).lightningChance = 0;
+                ((Wall) reinforcedSurgeWall).lightningChance = 0;
+                ((MendProjector) mender).reload = 800;
+                ((MendProjector) mendProjector).reload = 500;
+                radar.health = 500;
+                shockwaveTower.health = 2000;
+                thoriumReactor.health = 1400;
+                massDriver.health = 1250;
+                impactReactor.rebuildable = false;
+                ((ItemTurret) fuse).ammoTypes.values().toSeq().each(a -> a.pierce = false);
+                ((ItemTurret) fuse).ammoTypes.get(Items.titanium).damage = 10;
+                ((ItemTurret) fuse).ammoTypes.get(Items.thorium).damage = 20;
+                ((ItemTurret) scathe).ammoTypes.values().toSeq().each(a -> {
                     a.buildingDamageMultiplier = 0.3f;
                     a.damage = 700;
                     a.splashDamage = 80;
                 });
-                ((PowerTurret) Blocks.lancer).shootType.damage = 10;
-                ((PowerTurret) Blocks.arc).shootType.damage = 4;
-                ((PowerTurret) Blocks.arc).shootType.lightningLength = 15;
-                ((TractorBeamTurret) Blocks.parallax).force = 8;
-                ((TractorBeamTurret) Blocks.parallax).scaledForce = 7;
-                ((TractorBeamTurret) Blocks.parallax).range = 230;
-                ((TractorBeamTurret) Blocks.parallax).damage = 6;
-                ((ForceProjector) Blocks.forceProjector).shieldHealth = 2500;
+                ((PowerTurret) lancer).shootType.damage = 10;
+                ((PowerTurret) arc).shootType.damage = 4;
+                ((PowerTurret) arc).shootType.lightningLength = 15;
+                ((TractorBeamTurret) parallax).force = 8;
+                ((TractorBeamTurret) parallax).scaledForce = 7;
+                ((TractorBeamTurret) parallax).range = 230;
+                ((TractorBeamTurret) parallax).damage = 6;
+                ((ForceProjector) forceProjector).shieldHealth = 2500;
 
-                UnitTypes.merui.weapons.each(w -> {
-                    if(w.bullet instanceof ArtilleryBulletType) w.bullet.collides = true;
-                });
-                UnitTypes.quad.weapons.each(w -> {
+                merui.weapons.each(w -> w.bullet.collides = true);
+                quad.weapons.each(w -> {
                     w.bullet.pierceBuilding = true;
                     w.bullet.pierceCap = 9;
                 });
-                UnitTypes.alpha.weapons.each(w -> {
-                    w.bullet.buildingDamageMultiplier = 1;
-                });
-                UnitTypes.beta.weapons.each(w -> {
-                    w.bullet.buildingDamageMultiplier = 1;
-                });
-                UnitTypes.gamma.weapons.each(w -> {
-                    w.bullet.buildingDamageMultiplier = 1;
-                });
-                UnitTypes.crawler.health = 100;
-                UnitTypes.crawler.speed = 1.5f;
-                UnitTypes.crawler.accel = 0.08f;
-                UnitTypes.crawler.drag = 0.016f;
-                UnitTypes.crawler.hitSize = 6f;
-                UnitTypes.crawler.targetAir = false;
-                UnitTypes.atrax.speed = 0.5f;
-                UnitTypes.spiroct.speed = 0.4f;
-                UnitTypes.spiroct.targetAir = false;
-                UnitTypes.spiroct.weapons.each(w -> {
-                    if(w.bullet.damage == 23){
+                Seq.with(alpha, beta, gamma).flatMap(u -> u.weapons).each(w -> w.bullet.buildingDamageMultiplier = 1);
+                Seq.with(crawler, spiroct, arkyid).each(u -> u.targetAir = false);
+                crawler.health = 100;
+                crawler.speed = 1.5f;
+                crawler.accel = 0.08f;
+                crawler.drag = 0.016f;
+                crawler.hitSize = 6f;
+                atrax.speed = 0.5f;
+                pulsar.abilities.clear();
+                bryde.abilities.clear();
+                spiroct.speed = 0.4f;
+                spiroct.weapons.each(w -> {
+                    if(Objects.equals(w.name, "spiroct-weapon")){
                         w.bullet.damage = 25;
                     }else w.bullet.damage = 20;
                     if(w.bullet instanceof SapBulletType b) b.sapStrength = 0;
                 });
-                UnitTypes.arkyid.speed = 0.5f;
-                UnitTypes.arkyid.hitSize = 21f;
-                UnitTypes.arkyid.targetAir = false;
-                UnitTypes.arkyid.weapons.each(w -> {
-                    if(w.bullet instanceof SapBulletType b) b.sapStrength = 0;
-                    if(w.bullet instanceof ArtilleryBulletType){
+                arkyid.speed = 0.5f;
+                arkyid.hitSize = 21f;
+                arkyid.weapons.each(w -> {
+                    if(w.bullet instanceof SapBulletType b){
+                        b.sapStrength = 0;
+                    }else{
                         w.bullet.pierceBuilding = true;
                         w.bullet.pierceCap = 5;
                     }
                 });
-                UnitTypes.toxopid.hitSize = 21f;
-                UnitTypes.flare.health = 275;
-                UnitTypes.flare.engineOffset = 5.5f; // why?
-                UnitTypes.flare.range = 140;
-                UnitTypes.horizon.health = 440;
-                UnitTypes.horizon.speed = 1.7f;
-                UnitTypes.horizon.itemCapacity = 20;
-                UnitTypes.zenith.health = 1400;
-                UnitTypes.zenith.speed = 1.8f;
-                UnitTypes.oct.abilities.each(a -> {
+                toxopid.hitSize = 21f;
+                flare.health = 275;
+                flare.engineOffset = 5.5f; // why?
+                flare.range = 140;
+                horizon.health = 440;
+                horizon.speed = 1.7f;
+                horizon.itemCapacity = 20;
+                zenith.health = 1400;
+                zenith.speed = 1.8f;
+                vela.weapons.each(w -> w.bullet.damage = 20f);
+                oct.abilities.each(a -> {
                     if(a instanceof ForceFieldAbility f){
                         f.regen = 16f;
                         f.max = 15000f;
                     }
                 });
-                UnitTypes.minke.weapons.each(w -> {
+                minke.weapons.each(w -> {
                     if(w.bullet instanceof FlakBulletType){
                         w.bullet.collidesGround = true;
                     }
@@ -135,115 +130,104 @@ public class floodcompat extends Mod{
 
         Events.on(EventType.WorldLoadEvent.class, e -> {
             // no delay if the client's hosting, that would break stuff!
-            int delay = Vars.net.client() ? 3 : 0;
+            int delay = net.client() ? 3 : 0;
             flood = false;
 
-            if(delay > 0) Call.serverPacketReliable("flood", "v0.2");
+            if(delay > 0) Call.serverPacketReliable("flood", "v0.3");
             Timer.schedule(() -> {
                 // this is for cleanup only
                 if(!flood){
-                    if(Vars.net.client()) Vars.ui.chatfrag.addMessage("[scarlet]Server check failed...\n[accent]Playing on flood? Try rejoining!\nHave a nice day!");
+                    if(net.client()) ui.chatfrag.addMessage("[scarlet]Server check failed...\n[accent]Playing on flood? Try rejoining!\nHave a nice day!");
                     if(applied){
-                        Blocks.scrapWall.solid=Blocks.titaniumWall.solid=Blocks.thoriumWall.solid=true;
-                        ((Wall) Blocks.phaseWall).chanceDeflect = 10;
-                        ((Wall) Blocks.surgeWall).lightningChance = 0.05f;
-                        ((Wall) Blocks.reinforcedSurgeWall).lightningChance = 0.05f;
-                        Blocks.berylliumWall.absorbLasers = false;
-                        Blocks.berylliumWall.insulated = false;
-                        Blocks.tungstenWall.absorbLasers = false;
-                        Blocks.tungstenWall.insulated = false;
-                        Blocks.carbideWall.absorbLasers = false;
-                        Blocks.carbideWall.insulated = false;
-                        ((MendProjector) Blocks.mender).reload = 200;
-                        ((MendProjector) Blocks.mendProjector).reload = 250;
-                        Blocks.radar.health = 60;
-                        Blocks.shockwaveTower.health = 915;
-                        Blocks.thoriumReactor.health = 700;
-                        Blocks.massDriver.health = 430;
-                        Blocks.impactReactor.rebuildable = true;
-                        ((ItemTurret) Blocks.fuse).ammoTypes.values().toSeq().each(a -> a.pierce = true);
-                        ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.titanium).damage = 66;
-                        ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.thorium).damage = 105;
-                        ((ItemTurret) Blocks.scathe).ammoTypes.values().toSeq().each(a -> {
+                        Seq.with(scrapWall, titaniumWall, thoriumWall).each(w -> w.solid = true);
+                        Seq.with(berylliumWall, tungstenWall, carbideWall).each(w -> {
+                            w.insulated = w.absorbLasers = false;
+                        });
+                        ((Wall) phaseWall).chanceDeflect = 10;
+                        ((Wall) surgeWall).lightningChance = 0.05f;
+                        ((Wall) reinforcedSurgeWall).lightningChance = 0.05f;
+                        ((MendProjector) mender).reload = 200;
+                        ((MendProjector) mendProjector).reload = 250;
+                        radar.health = 60;
+                        shockwaveTower.health = 915;
+                        thoriumReactor.health = 700;
+                        massDriver.health = 430;
+                        impactReactor.rebuildable = true;
+                        ((ItemTurret) fuse).ammoTypes.values().toSeq().each(a -> a.pierce = true);
+                        ((ItemTurret) fuse).ammoTypes.get(Items.titanium).damage = 66;
+                        ((ItemTurret) fuse).ammoTypes.get(Items.thorium).damage = 105;
+                        ((ItemTurret) scathe).ammoTypes.values().toSeq().each(a -> {
                             a.buildingDamageMultiplier = 0.2f;
                             a.damage = 1500;
                             a.splashDamage = 160;
                         });
-                        ((PowerTurret) Blocks.lancer).shootType.damage = 140;
-                        ((PowerTurret) Blocks.arc).shootType.damage = 20;
-                        ((PowerTurret) Blocks.arc).shootType.lightningLength = 25;
-                        ((TractorBeamTurret) Blocks.parallax).force = 12f;
-                        ((TractorBeamTurret) Blocks.parallax).scaledForce = 6f;
-                        ((TractorBeamTurret) Blocks.parallax).range = 240f;
-                        ((TractorBeamTurret) Blocks.parallax).damage = 0.3f;
-                        ((ForceProjector) Blocks.forceProjector).shieldHealth = 750;
+                        ((PowerTurret) lancer).shootType.damage = 140;
+                        ((PowerTurret) arc).shootType.damage = 20;
+                        ((PowerTurret) arc).shootType.lightningLength = 25;
+                        ((TractorBeamTurret) parallax).force = 12f;
+                        ((TractorBeamTurret) parallax).scaledForce = 6f;
+                        ((TractorBeamTurret) parallax).range = 240f;
+                        ((TractorBeamTurret) parallax).damage = 0.3f;
+                        ((ForceProjector) forceProjector).shieldHealth = 750;
 
-                        UnitTypes.merui.weapons.each(w -> {
-                            if(w.bullet instanceof ArtilleryBulletType) w.bullet.collides = false;
-                        });
-                        UnitTypes.quad.weapons.each(w -> {
+                        merui.weapons.each(w -> w.bullet.collides = false);
+                        quad.weapons.each(w -> {
                             w.bullet.pierceBuilding = false;
                             w.bullet.pierceCap = -1;
                         });
-                        UnitTypes.alpha.weapons.each(w -> {
-                            w.bullet.buildingDamageMultiplier = 0.01f;
-                        });
-                        UnitTypes.beta.weapons.each(w -> {
-                            w.bullet.buildingDamageMultiplier = 0.01f;
-                        });
-                        UnitTypes.gamma.weapons.each(w -> {
-                            w.bullet.buildingDamageMultiplier = 0.01f;
-                        });
-                        UnitTypes.crawler.health = 200;
-                        UnitTypes.crawler.speed = 1f;
-                        UnitTypes.crawler.accel = 0;
-                        UnitTypes.crawler.drag = 0;
-                        UnitTypes.crawler.hitSize = 8f;
-                        UnitTypes.crawler.targetAir = true;
-                        UnitTypes.atrax.speed = 0.6f;
-                        UnitTypes.spiroct.speed = 0.54f;
-                        UnitTypes.spiroct.targetAir = true;
-                        UnitTypes.spiroct.weapons.each(w -> {
-                            if(w.bullet.damage == 25){
+                        Seq.with(alpha, beta, gamma).flatMap(u -> u.weapons).each(w -> w.bullet.buildingDamageMultiplier = 0.01f);
+                        Seq.with(crawler, spiroct, arkyid).each(u -> u.targetAir = true);
+                        crawler.health = 200;
+                        crawler.speed = 1f;
+                        crawler.accel = 0;
+                        crawler.drag = 0;
+                        crawler.hitSize = 8f;
+                        atrax.speed = 0.6f;
+                        pulsar.abilities.add(pulsarAbility);
+                        bryde.abilities.add(brydeAbility);
+                        spiroct.speed = 0.54f;
+                        spiroct.weapons.each(w -> {
+                            if(Objects.equals(w.name, "spiroct-weapon")){
                                 w.bullet.damage = 23;
                             }else w.bullet.damage = 18;
                             if(w.bullet instanceof SapBulletType b){
-                                if(b.damage == 23){
+                                if(Objects.equals(w.name, "spiroct-weapon")){
                                     b.sapStrength = 0.5f;
                                 }else b.sapStrength = 0.8f;
                             }
                         });
-                        UnitTypes.arkyid.speed = 0.62f;
-                        UnitTypes.arkyid.hitSize = 23f;
-                        UnitTypes.arkyid.targetAir = true;
-                        UnitTypes.arkyid.weapons.each(w -> {
-                            if(w.bullet instanceof SapBulletType b) b.sapStrength = 0.85f;
-                            if(w.bullet instanceof ArtilleryBulletType){
+                        arkyid.speed = 0.62f;
+                        arkyid.hitSize = 23f;
+                        arkyid.weapons.each(w -> {
+                            if(w.bullet instanceof SapBulletType b) {
+                                b.sapStrength = 0.85f;
+                            }else{
                                 w.bullet.pierceBuilding = false;
                                 w.bullet.pierceCap = -1;
                             }
                         });
-                        UnitTypes.toxopid.hitSize = 26f;
-                        UnitTypes.flare.health = 70;
-                        UnitTypes.flare.range = 104;
-                        UnitTypes.horizon.health = 340;
-                        UnitTypes.horizon.speed = 1.65f;
-                        UnitTypes.horizon.itemCapacity = 0;
-                        UnitTypes.zenith.health = 700;
-                        UnitTypes.zenith.speed = 1.7f;
-                        UnitTypes.oct.abilities.each(a -> {
+                        toxopid.hitSize = 26f;
+                        flare.health = 70;
+                        flare.range = 104;
+                        horizon.health = 340;
+                        horizon.speed = 1.65f;
+                        horizon.itemCapacity = 0;
+                        zenith.health = 700;
+                        zenith.speed = 1.7f;
+                        vela.weapons.each(w -> w.bullet.damage = 35f);
+                        oct.abilities.each(a -> {
                             if(a instanceof ForceFieldAbility f){
                                 f.regen = 4f;
                                 f.max = 7000f;
                             }
                         });
-                        UnitTypes.minke.weapons.each(w -> {
+                        minke.weapons.each(w -> {
                             if(w.bullet instanceof FlakBulletType){
                                 w.bullet.collidesGround = false;
                             }
                         });
 
-                        Vars.ui.chatfrag.addMessage("[accent]Flood changes reverted!\nConsider using /sync if playing on a server!\nIf you are the host, ignore this message!");
+                        ui.chatfrag.addMessage("[accent]Flood changes reverted!\nConsider using /sync if playing on a server!\nIf you are the host, ignore this message!");
                         applied = false;
                     }
                 }
