@@ -4,6 +4,7 @@ import arc.*;
 import arc.struct.Seq;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
@@ -19,7 +20,7 @@ import static mindustry.content.Blocks.*;
 import static mindustry.Vars.*;
 
 public class floodcompat extends Mod{
-    boolean flood, applied;
+    boolean flood, applied, enabled;
     Ability pulsarAbility, brydeAbility;
     public floodcompat(){
         Log.info("Flood Compatibility loaded!");
@@ -27,6 +28,13 @@ public class floodcompat extends Mod{
         Events.on(EventType.ContentInitEvent.class, e -> {
             pulsarAbility = pulsar.abilities.first();
             brydeAbility = bryde.abilities.first();
+        });
+
+        Events.on(EventType.ClientLoadEvent.class, e -> {
+            if(Structs.contains(Version.class.getDeclaredFields(), var -> var.getName().equals("foos"))){
+                ui.showInfo("[accent]Foo's Client [scarlet]detected, [cyan]FloodCompat[] is unnecessary!");
+                enabled = false;
+            }else enabled = true;
         });
 
         netClient.addPacketHandler("flood", (integer) -> {
@@ -129,10 +137,7 @@ public class floodcompat extends Mod{
         });
 
         Events.on(EventType.WorldLoadEvent.class, e -> {
-            if(Structs.contains(Version.class.getDeclaredFields(), var -> var.getName().equals("foos"))){
-                ui.chatfrag.addMessage("[scarlet]Foo's Client detected, FloodCompat is unnecessary!");
-                return;
-            }
+            if(!enabled) return;
             // no delay if the client's hosting, that would break stuff!
             int delay = net.client() ? 3 : 0;
             flood = false;
