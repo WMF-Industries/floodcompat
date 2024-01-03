@@ -129,6 +129,10 @@ public class floodcompat extends Mod{
         });
 
         Events.on(EventType.WorldLoadEvent.class, e -> {
+            if(Structs.contains(Version.class.getDeclaredFields(), var -> var.getName().equals("foos"))){
+                ui.chatfrag.addMessage("[scarlet]Foo's Client detected, FloodCompat is unnecessary!");
+                return;
+            }
             // no delay if the client's hosting, that would break stuff!
             int delay = net.client() ? 3 : 0;
             flood = false;
