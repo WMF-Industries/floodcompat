@@ -50,16 +50,13 @@ public class floodcompat extends Mod{
                 Blocks.thoriumReactor.health = 1400;
                 Blocks.massDriver.health = 1250;
                 Blocks.impactReactor.rebuildable = false;
-                ((ItemTurret) Blocks.fuse).ammoTypes.forEach(a -> {
-                    a.value.pierce = false;
-                    if(a.value.damage == 66){
-                        a.value.damage = 10;
-                    }else a.value.damage = 20;
-                });
-                ((ItemTurret) Blocks.scathe).ammoTypes.forEach(a -> {
-                    a.value.buildingDamageMultiplier = 0.3f;
-                    a.value.damage = 700;
-                    a.value.splashDamage = 80;
+                ((ItemTurret) Blocks.fuse).ammoTypes.values().toSeq().each(a -> a.pierce = false);
+                ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.titanium).damage = 10;
+                ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.thorium).damage = 20;
+                ((ItemTurret) Blocks.scathe).ammoTypes.values().toSeq().each(a -> {
+                    a.buildingDamageMultiplier = 0.3f;
+                    a.damage = 700;
+                    a.splashDamage = 80;
                 });
                 ((PowerTurret) Blocks.lancer).shootType.damage = 10;
                 ((PowerTurret) Blocks.arc).shootType.damage = 4;
@@ -70,20 +67,20 @@ public class floodcompat extends Mod{
                 ((TractorBeamTurret) Blocks.parallax).damage = 6;
                 ((ForceProjector) Blocks.forceProjector).shieldHealth = 2500;
 
-                UnitTypes.merui.weapons.forEach(w -> {
+                UnitTypes.merui.weapons.each(w -> {
                     if(w.bullet instanceof ArtilleryBulletType) w.bullet.collides = true;
                 });
-                UnitTypes.quad.weapons.forEach(w -> {
+                UnitTypes.quad.weapons.each(w -> {
                     w.bullet.pierceBuilding = true;
                     w.bullet.pierceCap = 9;
                 });
-                UnitTypes.alpha.weapons.forEach(w -> {
+                UnitTypes.alpha.weapons.each(w -> {
                     w.bullet.buildingDamageMultiplier = 1;
                 });
-                UnitTypes.beta.weapons.forEach(w -> {
+                UnitTypes.beta.weapons.each(w -> {
                     w.bullet.buildingDamageMultiplier = 1;
                 });
-                UnitTypes.gamma.weapons.forEach(w -> {
+                UnitTypes.gamma.weapons.each(w -> {
                     w.bullet.buildingDamageMultiplier = 1;
                 });
                 UnitTypes.crawler.health = 100;
@@ -95,7 +92,7 @@ public class floodcompat extends Mod{
                 UnitTypes.atrax.speed = 0.5f;
                 UnitTypes.spiroct.speed = 0.4f;
                 UnitTypes.spiroct.targetAir = false;
-                UnitTypes.spiroct.weapons.forEach(w -> {
+                UnitTypes.spiroct.weapons.each(w -> {
                     if(w.bullet.damage == 23){
                         w.bullet.damage = 25;
                     }else w.bullet.damage = 20;
@@ -104,7 +101,7 @@ public class floodcompat extends Mod{
                 UnitTypes.arkyid.speed = 0.5f;
                 UnitTypes.arkyid.hitSize = 21f;
                 UnitTypes.arkyid.targetAir = false;
-                UnitTypes.arkyid.weapons.forEach(w -> {
+                UnitTypes.arkyid.weapons.each(w -> {
                     if(w.bullet instanceof SapBulletType b) b.sapStrength = 0;
                     if(w.bullet instanceof ArtilleryBulletType){
                         w.bullet.pierceBuilding = true;
@@ -120,13 +117,13 @@ public class floodcompat extends Mod{
                 UnitTypes.horizon.itemCapacity = 20;
                 UnitTypes.zenith.health = 1400;
                 UnitTypes.zenith.speed = 1.8f;
-                UnitTypes.oct.abilities.forEach(a -> {
+                UnitTypes.oct.abilities.each(a -> {
                     if(a instanceof ForceFieldAbility f){
                         f.regen = 16f;
                         f.max = 15000f;
                     }
                 });
-                UnitTypes.minke.weapons.forEach(w -> {
+                UnitTypes.minke.weapons.each(w -> {
                     if(w.bullet instanceof FlakBulletType){
                         w.bullet.collidesGround = true;
                     }
@@ -164,16 +161,13 @@ public class floodcompat extends Mod{
                         Blocks.thoriumReactor.health = 700;
                         Blocks.massDriver.health = 430;
                         Blocks.impactReactor.rebuildable = true;
-                        ((ItemTurret) Blocks.fuse).ammoTypes.forEach(a -> {
-                            a.value.pierce = true;
-                            if(a.value.damage == 10){
-                                a.value.damage = 66;
-                            }else a.value.damage = 105;
-                        });
-                        ((ItemTurret) Blocks.scathe).ammoTypes.forEach(a -> {
-                            a.value.buildingDamageMultiplier = 0.2f;
-                            a.value.damage = 1500;
-                            a.value.splashDamage = 160;
+                        ((ItemTurret) Blocks.fuse).ammoTypes.values().toSeq().each(a -> a.pierce = true);
+                        ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.titanium).damage = 66;
+                        ((ItemTurret) Blocks.fuse).ammoTypes.get(Items.thorium).damage = 105;
+                        ((ItemTurret) Blocks.scathe).ammoTypes.values().toSeq().each(a -> {
+                            a.buildingDamageMultiplier = 0.2f;
+                            a.damage = 1500;
+                            a.splashDamage = 160;
                         });
                         ((PowerTurret) Blocks.lancer).shootType.damage = 140;
                         ((PowerTurret) Blocks.arc).shootType.damage = 20;
@@ -184,20 +178,20 @@ public class floodcompat extends Mod{
                         ((TractorBeamTurret) Blocks.parallax).damage = 0.3f;
                         ((ForceProjector) Blocks.forceProjector).shieldHealth = 750;
 
-                        UnitTypes.merui.weapons.forEach(w -> {
+                        UnitTypes.merui.weapons.each(w -> {
                             if(w.bullet instanceof ArtilleryBulletType) w.bullet.collides = false;
                         });
-                        UnitTypes.quad.weapons.forEach(w -> {
+                        UnitTypes.quad.weapons.each(w -> {
                             w.bullet.pierceBuilding = false;
                             w.bullet.pierceCap = -1;
                         });
-                        UnitTypes.alpha.weapons.forEach(w -> {
+                        UnitTypes.alpha.weapons.each(w -> {
                             w.bullet.buildingDamageMultiplier = 0.01f;
                         });
-                        UnitTypes.beta.weapons.forEach(w -> {
+                        UnitTypes.beta.weapons.each(w -> {
                             w.bullet.buildingDamageMultiplier = 0.01f;
                         });
-                        UnitTypes.gamma.weapons.forEach(w -> {
+                        UnitTypes.gamma.weapons.each(w -> {
                             w.bullet.buildingDamageMultiplier = 0.01f;
                         });
                         UnitTypes.crawler.health = 200;
@@ -209,7 +203,7 @@ public class floodcompat extends Mod{
                         UnitTypes.atrax.speed = 0.6f;
                         UnitTypes.spiroct.speed = 0.54f;
                         UnitTypes.spiroct.targetAir = true;
-                        UnitTypes.spiroct.weapons.forEach(w -> {
+                        UnitTypes.spiroct.weapons.each(w -> {
                             if(w.bullet.damage == 25){
                                 w.bullet.damage = 23;
                             }else w.bullet.damage = 18;
@@ -222,11 +216,11 @@ public class floodcompat extends Mod{
                         UnitTypes.arkyid.speed = 0.62f;
                         UnitTypes.arkyid.hitSize = 23f;
                         UnitTypes.arkyid.targetAir = true;
-                        UnitTypes.arkyid.weapons.forEach(w -> {
+                        UnitTypes.arkyid.weapons.each(w -> {
                             if(w.bullet instanceof SapBulletType b) b.sapStrength = 0.85f;
                             if(w.bullet instanceof ArtilleryBulletType){
                                 w.bullet.pierceBuilding = false;
-                                w.bullet.pierceCap = 0;
+                                w.bullet.pierceCap = -1;
                             }
                         });
                         UnitTypes.toxopid.hitSize = 26f;
@@ -237,13 +231,13 @@ public class floodcompat extends Mod{
                         UnitTypes.horizon.itemCapacity = 0;
                         UnitTypes.zenith.health = 700;
                         UnitTypes.zenith.speed = 1.7f;
-                        UnitTypes.oct.abilities.forEach(a -> {
+                        UnitTypes.oct.abilities.each(a -> {
                             if(a instanceof ForceFieldAbility f){
                                 f.regen = 4f;
                                 f.max = 7000f;
                             }
                         });
-                        UnitTypes.minke.weapons.forEach(w -> {
+                        UnitTypes.minke.weapons.each(w -> {
                             if(w.bullet instanceof FlakBulletType){
                                 w.bullet.collidesGround = false;
                             }
