@@ -80,10 +80,26 @@ public class floodcompat extends Mod{
 
                 merui.weapons.each(w -> w.bullet.collides = true);
                 quad.weapons.each(w -> {
-                    w.bullet.pierceBuilding = true;
-                    w.bullet.pierceCap = 9;
+                    w.bullet.damage = 100;
+                    w.bullet.splashDamage = 250;
+                    w.bullet.splashDamageRadius = 100f;
                 });
-                Seq.with(alpha, beta, gamma).flatMap(u -> u.weapons).each(w -> w.bullet.buildingDamageMultiplier = 1);
+                fortress.weapons.each(w -> {
+                    w.bullet.damage = 40;
+                    w.bullet.splashDamageRadius = 60f;
+                });
+                scepter.weapons.each(w -> {
+                    if(Objects.equals(w.name, "scepter-weapon")){
+                        w.bullet.pierce = true;
+                        w.bullet.pierceCap = 3;
+                    }else{
+                        w.bullet.damage = 25;
+                    }
+                });
+                reign.weapons.each(w -> {
+                    w.bullet.damage = 120;
+                    w.bullet.fragBullet.damage = 30;
+                });
                 Seq.with(crawler, spiroct, arkyid).each(u -> u.targetAir = false);
                 crawler.health = 100;
                 crawler.speed = 1.5f;
@@ -107,10 +123,16 @@ public class floodcompat extends Mod{
                         b.sapStrength = 0;
                     }else{
                         w.bullet.pierceBuilding = true;
-                        w.bullet.pierceCap = 5;
+                        w.bullet.pierceCap = 7;
                     }
                 });
                 toxopid.hitSize = 21f;
+                toxopid.weapons.each(w -> {
+                    if(Objects.equals(w.name, "toxopid-cannon")) {
+                        w.bullet.fragBullet.pierce = true;
+                        w.bullet.fragBullet.pierceCap = 2;
+                    }
+                });
                 flare.health = 275;
                 flare.engineOffset = 5.5f; // why?
                 flare.range = 140;
@@ -142,7 +164,7 @@ public class floodcompat extends Mod{
             int delay = net.client() ? 3 : 0;
             flood = false;
 
-            if(delay > 0) Call.serverPacketReliable("flood", "v0.3");
+            if(delay > 0) Call.serverPacketReliable("flood", "0.4");
             Timer.schedule(() -> {
                 // this is for cleanup only
                 if(!flood){
@@ -181,10 +203,26 @@ public class floodcompat extends Mod{
 
                         merui.weapons.each(w -> w.bullet.collides = false);
                         quad.weapons.each(w -> {
-                            w.bullet.pierceBuilding = false;
-                            w.bullet.pierceCap = -1;
+                            w.bullet.damage = -1;
+                            w.bullet.splashDamage = 220;
+                            w.bullet.splashDamageRadius = 80f;
                         });
-                        Seq.with(alpha, beta, gamma).flatMap(u -> u.weapons).each(w -> w.bullet.buildingDamageMultiplier = 0.01f);
+                        fortress.weapons.each(w -> {
+                            w.bullet.damage = 20;
+                            w.bullet.splashDamageRadius = 35f;
+                        });
+                        scepter.weapons.each(w -> {
+                            if(Objects.equals(w.name, "scepter-weapon")){
+                                w.bullet.pierce = false;
+                                w.bullet.pierceCap = -1;
+                            }else{
+                                w.bullet.damage = 10;
+                            }
+                        });
+                        reign.weapons.each(w -> {
+                            w.bullet.damage = 80;
+                            w.bullet.fragBullet.damage = 20;
+                        });
                         Seq.with(crawler, spiroct, arkyid).each(u -> u.targetAir = true);
                         crawler.health = 200;
                         crawler.speed = 1f;
@@ -216,6 +254,12 @@ public class floodcompat extends Mod{
                             }
                         });
                         toxopid.hitSize = 26f;
+                        toxopid.weapons.each(w -> {
+                            if(Objects.equals(w.name, "toxopid-cannon")) {
+                                w.bullet.fragBullet.pierce = false;
+                                w.bullet.fragBullet.pierceCap = -1;
+                            }
+                        });
                         flare.health = 70;
                         flare.range = 104;
                         horizon.health = 340;
